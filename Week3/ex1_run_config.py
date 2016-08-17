@@ -1,4 +1,3 @@
-
 import cPickle as pickle
 import os.path
 from getpass import getpass
@@ -20,6 +19,42 @@ RUN_LAST_CHANGED = '1.3.6.1.4.1.9.9.43.1.1.1.0'
 # Relevant SNMP OIDs
 SYS_NAME = '1.3.6.1.2.1.1.5.0'
 SYS_UPTIME = '1.3.6.1.2.1.1.3.0'
+
+
+def get_saved_dicts(file_name):
+	
+	if not os.path.isfile(file_name):
+		return {}
+		
+	net_dicts = {}
+	with open(file_name, 'r') as f:
+		dicts = pickle.load(f)
+		for key in dicts.keys():
+			net_dicts[dicts[device_name]] = dicts
+		
+		return (net_dicts)
+
+def send_notification(device):
+
+	current_time = datetime.now()
+	name_of_device = str(device[device_name])
+	
+	
+	sender = 'stelica.dragnia@gmail.com'
+	recipient = 'stelica.dragnia@gmail'
+	subject = 'Device {0} was modified' .format(name_of_device)
+	
+	message = '''
+
+The running configuration of {0} was modified at: {1}
+
+'''.format(name_of_device, current_time)
+
+	if send_mail(recipient, subject, message, sender):
+		print 'Email notification sent to %s ' %recipient
+		return True
+
+
 
 def main():
     
@@ -59,12 +94,28 @@ def main():
                 
                     print ' Device reloaded and changed'
                     send_notification(current_data[device_name])
-                    
+                    current_data['device'] = {'device_name': device_name, 'uptime' = uptime, 'last_changed' = last_changed}
             
-            elif last_changed < 
-                    
-                    
-            
-    
-    
+            elif last_changed > prev_dev['last_changed']
+                print ' Device changed'
+				send_notification(current_data[device_name])
+				current_data['device'] = {'device_name': device_name, 'uptime' = uptime, 'last_changed' = last_changed}				
 
+            elif last_changed == prev_dev['last_changed']
+                print ' Device not changed'
+				current_data['device'] = {'device_name': device_name, 'uptime' = uptime, 'last_changed' = last_changed}	
+		
+		else:
+			current_data['device'] = {'device_name': device_name, 'uptime' = uptime, 'last_changed' = last_changed}
+		
+	with open('devices.pkl', 'w') as f:
+		for key in current_data.keys():
+			pickle.dump(key, f)
+			
+		print
+		
+if __name__ == '__main__':
+	main()
+	
+			
+                    
