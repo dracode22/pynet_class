@@ -1,0 +1,14 @@
+---
+- name: Load Config
+  hosts: pynet-sf-srx
+  tasks:
+    - name: Verifying NETCONF
+      wait_for: host={{ ansible_ssh_host }} port=830
+
+    - name: Change the hostname
+      junos_install_config:
+        host={{ ansible_ssh_host }}
+        file=change_hostname.xml
+        overwrite=false
+        user={{ juniper_user }}
+        passwd={{ juniper_passwd }}
